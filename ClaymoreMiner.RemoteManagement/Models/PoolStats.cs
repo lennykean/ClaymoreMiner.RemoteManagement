@@ -1,7 +1,10 @@
-﻿namespace ClaymoreMiner.RemoteManagement.Models
+﻿using Newtonsoft.Json;
+
+namespace ClaymoreMiner.RemoteManagement.Models
 {
     public class PoolStats
     {
+        [JsonConstructor]
         public PoolStats(string pool, int hashRate, int shares, int invalidShares, int rejectedShares, int poolSwitches)
         {
             Pool = pool;

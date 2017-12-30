@@ -1,7 +1,10 @@
-﻿namespace ClaymoreMiner.RemoteManagement.Models
+﻿using Newtonsoft.Json;
+
+namespace ClaymoreMiner.RemoteManagement.Models
 {
     public class GpuStats
     {
+        [JsonConstructor]
         public GpuStats(GpuMode mode, int ethereumHashrate, int decredHashrate, int temperature, int fanSpeed)
         {
             Mode = mode;
