@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClaymoreMiner.RemoteManagement", "ClaymoreMiner.RemoteManagement\ClaymoreMiner.RemoteManagement.csproj", "{86674995-8F69-4DBB-8A24-E6190B5FEB0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClaymoreMiner.RemoteManagement", "ClaymoreMiner.RemoteManagement\ClaymoreMiner.RemoteManagement.csproj", "{86674995-8F69-4DBB-8A24-E6190B5FEB0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClaymoreMiner.RemoteManagement.Tests", "ClaymoreMiner.RemoteManagement.Tests\ClaymoreMiner.RemoteManagement.Tests.csproj", "{0347F195-1914-41AA-8AED-0EB4DC6FFC0C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClaymoreMiner.RemoteManagement.Tests", "ClaymoreMiner.RemoteManagement.Tests\ClaymoreMiner.RemoteManagement.Tests.csproj", "{0347F195-1914-41AA-8AED-0EB4DC6FFC0C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
