@@ -1,4 +1,3 @@
-version: 1.0.{build}
 image: Visual Studio 2017
 environment:
   major: 1
@@ -6,27 +5,25 @@ environment:
   patch: 1
 configuration: Release
 init:
-  - git config --global core.autocrlf true
-  - ps: |
-      $isCI = $Env:APPVEYOR_REPO_TAG -eq $false
-      $isBranch = $isCI -and ($Env:APPVEYOR_REPO_BRANCH -ne 'master')
-      $branchSuffix = "$(if ($isBranch) { '-' + $Env:APPVEYOR_REPO_BRANCH } else { $null })"
-      $Env:VersionPrefix = "$($Env:major).$($Env:minor).$($Env:patch)"
-      $Env:VersionSuffix = "$(if ($isCI) { $Env:APPVEYOR_BUILD_NUMBER + $branchSuffix } else { $null })"
-      appveyor UpdateBuild -Version "$($Env:VersionPrefix)$(if ($isCI) { '-' } else { $null })$($Env:VersionSuffix)"
+- ps: |
+    $isCI = $Env:APPVEYOR_REPO_TAG -eq $false
+    $isBranch = $isCI -and ($Env:APPVEYOR_REPO_BRANCH -ne 'master')
+    $Env:VersionPrefix = "$($Env:major).$($Env:minor).$($Env:patch)"
+    $Env:VersionSuffix = "$(if ($isBranch) { '-' + $Env:APPVEYOR_REPO_BRANCH + $APPVEYOR_BUILD_NUMBER} else { $null })"
+    appveyor UpdateBuild -Version "$($Env:VersionPrefix)$(if ($isCI) { $Env:VersionSuffix } else { $null })"
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
-  assembly_version: $(VersionPrefix).0
+  assembly_version: $(VersionPrefix)
   assembly_file_version: $(VersionPrefix).$(APPVEYOR_BUILD_NUMBER)
-  assembly_informational_version: '{version}'
+  assembly_informational_version: $(VersionPrefix)
 nuget:
   project_feed: true
 before_build:
-  - dotnet restore src
+- dotnet restore src
 build:
   project: src/ClaymoreMiner.RemoteManagement.sln
-  verbosity: minimal  
+  verbosity: minimal
 artifacts:
   - path: '**\*.nupkg'
 deploy:
