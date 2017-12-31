@@ -16,13 +16,29 @@ namespace ClaymoreMiner.RemoteManagement
         private readonly RpcClientFactory _rpcClientFactory;
         private readonly IMapper<string[], MinerStatistics> _mapper;
 
+        /// <summary>
+        /// Initializes a new <see cref="RemoteManagementClient"/> with claymores default remote management port.
+        /// </summary>
+        /// <param name="address">Miner address</param>
         public RemoteManagementClient(string address) : this(address, 3333, null)
         {
         }
+
+        /// <summary>
+        /// Initializes a new <see cref="RemoteManagementClient"/>.
+        /// </summary>
+        /// <param name="address">Miner address</param>
+        /// <param name="port">Miner remote management port</param>
         public RemoteManagementClient(string address, int port) : this(address, port, null)
         {
         }
-        
+
+        /// <summary>
+        /// Initializes a new <see cref="RemoteManagementClient"/> with a password.
+        /// </summary>
+        /// <param name="address">Miner address</param>
+        /// <param name="port">Miner remote management port</param>
+        /// <param name="password">Miner remote management password</param>
         public RemoteManagementClient(string address, int port, string password) : this(address, port, password, 
             new TcpRpcConnectionFactory(address, port), 
             new ClaymoreApiRpcClientFactory(password), 
@@ -44,10 +60,22 @@ namespace ClaymoreMiner.RemoteManagement
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Miner Address
+        /// </summary>
         public string Address { get; }
+        
+        /// <summary>
+        /// Miner remote management port 
+        /// </summary>
+        /// <remarks>The default port is 3333</remarks>
         public int Port { get; }
+
         internal string Password { get; }
 
+        /// <summary>
+        /// Gets current statistics
+        /// </summary>
         public async Task<MinerStatistics> GetStatisticsAsync()
         {
             var stats = await InvokeAsync<string[]>("miner_getstat1");
@@ -55,21 +83,39 @@ namespace ClaymoreMiner.RemoteManagement
             return _mapper.Map(stats);
         }
 
+        /// <summary>
+        /// Restarts miner
+        /// </summary>
         public async Task RestartMinerAsync()
         {
             await InvokeAsync("miner_restart");
         }
 
+        /// <summary>
+        /// Reboots miner
+        /// </summary>
+        /// <remarks>
+        /// Calls "reboot.bat" for Windows, or "reboot.bash" (or "reboot.sh") for Linux.
+        /// </remarks>
         public async Task RebootMinerAsync()
         {
             await InvokeAsync("miner_reboot");
         }
 
+        /// <summary>
+        /// Set the mode for all GPUs
+        /// </summary>
+        /// <param name="mode">GPU mode</param>
         public async Task SetGpuModeAsync(GpuMode mode)
         {
             await SetGpuModeAsync(-1, mode);
         }
 
+        /// <summary>
+        /// Set the mode for GPU with at specified index
+        /// </summary>
+        /// <param name="gpuIndex">GPU index</param>
+        /// <param name="mode">GPU mode</param>
         public async Task SetGpuModeAsync(int gpuIndex, GpuMode mode)
         {
             await InvokeAsync("control_gpu", gpuIndex.ToString(), ((int)mode).ToString());

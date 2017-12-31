@@ -5,6 +5,9 @@ using Newtonsoft.Json;
 
 namespace ClaymoreMiner.RemoteManagement.Models
 {
+    /// <summary>
+    /// Miner statistics
+    /// </summary>
     public class MinerStatistics
     {
         [JsonConstructor]
@@ -16,10 +19,25 @@ namespace ClaymoreMiner.RemoteManagement.Models
             Decred = decred;
             Gpus = gpus.ToImmutableList();
         }
+        /// <summary>
+        /// Miner version
+        /// </summary>
         public string MinerVersion { get; }
+        /// <summary>
+        /// Miner uptime
+        /// </summary>
         public TimeSpan Uptime { get; }
+        /// <summary>
+        /// Ethereum statistics
+        /// </summary>
         public PoolStats Ethereum { get; }
+        /// <summary>
+        /// Decred statistics
+        /// </summary>
         public PoolStats Decred { get; }
+        /// <summary>
+        /// Statistics for all GPUs
+        /// </summary>
         public ImmutableList<GpuStats> Gpus { get; }
     }
 }
