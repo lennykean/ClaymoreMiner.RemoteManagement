@@ -21,7 +21,7 @@ dotnet_csproj:
 nuget:
   project_feed: true
 before_build:
-  - dotnet restore
+  - dotnet restore src
 build:
   verbosity: normal
 artifacts:
