@@ -50,6 +50,21 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             _mockRpcConnection.Setup(m => m.GetStream()).Returns(() => _localStream);
         }
 
+        [TestCase(TestName = "RemoteManagementClient.ctor sets properties")]
+        public void ConstructorSetsProperties()
+        {
+            // arrange
+            var address = "test-miner-address";
+            var port = 3333;
+
+            // act
+            var client = new RemoteManagementClient(address, port);
+
+            //
+            Assert.That(client, Has.Property(nameof(client.Address)).EqualTo(address));
+            Assert.That(client, Has.Property(nameof(client.Port)).EqualTo(port));
+        }
+
         [Test]
         public async Task TestGetStatisticsAsync()
         {
