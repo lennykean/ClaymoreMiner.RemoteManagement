@@ -20,6 +20,8 @@ dotnet_csproj:
   informational_version: '{version}'
 nuget:
   project_feed: true
+before_build:
+  - dotnet restore
 build:
   verbosity: normal
 artifacts:
