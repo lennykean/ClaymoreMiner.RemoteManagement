@@ -30,8 +30,8 @@ namespace ClaymoreMiner.RemoteManagement.Tests
 
             // act
             var originalJson = JsonConvert.SerializeObject(stats);
-            var deseralizedStats = JsonConvert.DeserializeObject<MinerStatistics>(originalJson);
-            var reSerializedJson = JsonConvert.SerializeObject(deseralizedStats);
+            var deserializedStats = JsonConvert.DeserializeObject<MinerStatistics>(originalJson);
+            var reSerializedJson = JsonConvert.SerializeObject(deserializedStats);
 
             // assert
             Assert.That(reSerializedJson, Is.EqualTo(originalJson));

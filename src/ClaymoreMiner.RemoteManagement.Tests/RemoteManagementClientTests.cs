@@ -75,12 +75,12 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             var resultTask = client.GetStatisticsAsync();
             
             // read the message sent to the server
-            var mockServerRecieveBuffer = new MemoryStream();
-            var mockServerReadTask = _mockServerStream.CopyToAsync(mockServerRecieveBuffer);
-            var recievedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerRecieveBuffer.ToArray()));
+            var mockServerReceiveBuffer = new MemoryStream();
+            var mockServerReadTask = _mockServerStream.CopyToAsync(mockServerReceiveBuffer);
+            var receivedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerReceiveBuffer.ToArray()));
             
             // send the response message back to the client
-            var sendMessage = JsonConvert.SerializeObject(new {id = recievedMessage["id"], result = ResponsePayload });
+            var sendMessage = JsonConvert.SerializeObject(new {id = receivedMessage["id"], result = ResponsePayload });
             var mockServerSendBuffer = new MemoryStream(Encoding.ASCII.GetBytes(sendMessage));
             var mockServerWriteTask = mockServerSendBuffer.CopyToAsync(_mockServerStream);
 
@@ -93,8 +93,8 @@ namespace ClaymoreMiner.RemoteManagement.Tests
 
             // assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(recievedMessage["method"].ToString(), Is.EqualTo("miner_getstat1"));
-            Assert.That(recievedMessage["params"].ToObject<object[]>, Is.Empty);
+            Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("miner_getstat1"));
+            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.Empty);
         }
 
         [Test]
@@ -107,16 +107,16 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             var task = client.RestartMinerAsync();
 
             // read the message sent to the server
-            var mockServerRecieveBuffer = new MemoryStream();
-            await _mockServerStream.CopyToAsync(mockServerRecieveBuffer);
-            var recievedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerRecieveBuffer.ToArray()));
+            var mockServerReceiveBuffer = new MemoryStream();
+            await _mockServerStream.CopyToAsync(mockServerReceiveBuffer);
+            var receivedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerReceiveBuffer.ToArray()));
 
             // complete task
             await task;
 
             // assert
-            Assert.That(recievedMessage["method"].ToString(), Is.EqualTo("miner_restart"));
-            Assert.That(recievedMessage["params"].ToObject<object[]>, Is.Empty);
+            Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("miner_restart"));
+            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.Empty);
         }
 
         [Test]
@@ -129,16 +129,16 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             var task = client.RebootMinerAsync();
 
             // read the message sent to the server
-            var mockServerRecieveBuffer = new MemoryStream();
-            await _mockServerStream.CopyToAsync(mockServerRecieveBuffer);
-            var recievedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerRecieveBuffer.ToArray()));
+            var mockServerReceiveBuffer = new MemoryStream();
+            await _mockServerStream.CopyToAsync(mockServerReceiveBuffer);
+            var receivedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerReceiveBuffer.ToArray()));
 
             // complete task
             await task;
 
             // assert
-            Assert.That(recievedMessage["method"].ToString(), Is.EqualTo("miner_reboot"));
-            Assert.That(recievedMessage["params"].ToObject<object[]>, Is.Empty);
+            Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("miner_reboot"));
+            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.Empty);
         }
 
         [TestCase(1, GpuMode.Disabled)]
@@ -153,16 +153,16 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             var task = client.SetGpuModeAsync(index, mode);
 
             // read the message sent to the server
-            var mockServerRecieveBuffer = new MemoryStream();
-            await _mockServerStream.CopyToAsync(mockServerRecieveBuffer);
-            var recievedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerRecieveBuffer.ToArray()));
+            var mockServerReceiveBuffer = new MemoryStream();
+            await _mockServerStream.CopyToAsync(mockServerReceiveBuffer);
+            var receivedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerReceiveBuffer.ToArray()));
 
             // complete task
             await task;
 
             // assert
-            Assert.That(recievedMessage["method"].ToString(), Is.EqualTo("control_gpu"));
-            Assert.That(recievedMessage["params"].ToObject<object[]>, Is.EqualTo(new object[] {index, (int)mode}));
+            Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("control_gpu"));
+            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.EqualTo(new object[] {index, (int)mode}));
         }
 
         [TestCase(GpuMode.Disabled)]
@@ -177,16 +177,16 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             var task = client.SetGpuModeAsync(mode);
 
             // read the message sent to the server
-            var mockServerRecieveBuffer = new MemoryStream();
-            await _mockServerStream.CopyToAsync(mockServerRecieveBuffer);
-            var recievedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerRecieveBuffer.ToArray()));
+            var mockServerReceiveBuffer = new MemoryStream();
+            await _mockServerStream.CopyToAsync(mockServerReceiveBuffer);
+            var receivedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerReceiveBuffer.ToArray()));
 
             // complete task
             await task;
 
             // assert
-            Assert.That(recievedMessage["method"].ToString(), Is.EqualTo("control_gpu"));
-            Assert.That(recievedMessage["params"].ToObject<object[]>, Is.EqualTo(new object[] { -1, (int)mode }));
+            Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("control_gpu"));
+            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.EqualTo(new object[] { -1, (int)mode }));
         }
     }
 }
