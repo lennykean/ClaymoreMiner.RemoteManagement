@@ -32,7 +32,7 @@ artifacts:
 deploy:
 - provider: NuGet
   api_key:
-    secure: Fs9ENPTv7h53rMhP9kJqdV5tueZutTV+JCr5/YUKbRml86FlKA3hj2HxEcx0q8M7HG88v+DGNSs3epMqb1cgq5IAKu5CQVPV3evGtZ2ihJs=
+    secure: KYazkCEi9oMn1AALPvX9WRLKoBfGmk7WNsAxs+sfmOov/pSQcS/48m0Dl8aV3hX8
   artifact: /.*\.nupkg/
   on:
     appveyor_repo_tag: true
