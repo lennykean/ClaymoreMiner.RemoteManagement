@@ -16,6 +16,9 @@ namespace ClaymoreMiner.RemoteManagement
         private readonly RpcClientFactory _rpcClientFactory;
         private readonly IMapper<string[], MinerStatistics> _mapper;
 
+        public RemoteManagementClient(string address) : this(address, 3333, null)
+        {
+        }
         public RemoteManagementClient(string address, int port) : this(address, port, null)
         {
         }
