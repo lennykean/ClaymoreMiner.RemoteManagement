@@ -56,7 +56,7 @@ await client.RebootMinerAsync();
 await client.SetGpuModeAsync(mode);
 
 // Set the mode of a single GPU
-await client.SetGpuModeAsync(gpuIndesx, mode);
+await client.SetGpuModeAsync(gpuIndex, mode);
 ```
 
 ### Miner Statistics data
