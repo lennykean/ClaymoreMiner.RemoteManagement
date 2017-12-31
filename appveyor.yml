@@ -26,7 +26,10 @@ before_build:
   - dotnet restore src
 build:
   project: src/ClaymoreMiner.RemoteManagement.sln
-  verbosity: normal
+  verbosity: minimal  
+  publish_nuget: true
+  publish_nuget_symbols: true
+  include_nuget_references: true
 artifacts:
   - path: '**\$(APPVEYOR_PROJECT_NAME).$(APPVEYOR_BUILD_VERSION).nupkg'
   - path: '**\$(APPVEYOR_PROJECT_NAME).$(APPVEYOR_BUILD_VERSION).symbols.nupkg'
