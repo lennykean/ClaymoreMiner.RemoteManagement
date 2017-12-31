@@ -18,7 +18,9 @@ dotnet_csproj:
   file_version: '{version}'
   informational_version: '{version}'
 nuget:
-  project_feed: true
+  project_feed: true		    
+-before_build:		
+  - dotnet restore src
 build:  
   project: src/ClaymoreMiner.RemoteManagement.sln
   verbosity: normal
