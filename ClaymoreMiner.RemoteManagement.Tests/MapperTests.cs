@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Linq;
-
 using NUnit.Framework;
 
 namespace ClaymoreMiner.RemoteManagement.Tests
 {
     using Mapper;
-
     using Models;
 
     [TestFixture]
@@ -42,8 +40,11 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             TestName = "Mapper sets miner properties - dual mining")]
         public void MapperSetsMinerProperties(string version, int uptime, string[] statsArray)
         {
+            // arrange
+            var mapper = new MinerStatisticsMapper();
+
             // act
-            var stats = statsArray.ToMinerStatistics();
+            var stats = mapper.Map(statsArray);
 
             // assert
             Assert.That(stats, Has.Property(nameof(MinerStatistics.MinerVersion)).EqualTo(version));
@@ -80,8 +81,11 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             TestName = "Mapper sets ethereum properties - dual mining")]
         public void MapperSetsEthereumProperties(string pool, int hashrate, int shares, int rejectedShares, int invalidShares, int poolSwitches, string[] statsArray)
         {
+            // arrange
+            var mapper = new MinerStatisticsMapper();
+
             // act
-            var stats = statsArray.ToMinerStatistics();
+            var stats = mapper.Map(statsArray);
 
             // assert
             Assert.That(stats.Ethereum, Is.Not.Null);
@@ -123,8 +127,11 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             TestName = "Mapper sets decred properties - dual mining")]
         public void MapperSetsDecredProperties(string pool, int hashrate, int shares, int rejectedShares, int invalidShares, int poolSwitches, string[] statsArray)
         {
+            // arrange
+            var mapper = new MinerStatisticsMapper();
+
             // act
-            var stats = statsArray.ToMinerStatistics();
+            var stats = mapper.Map(statsArray);
 
             // assert
             Assert.That(stats.Decred, Is.Not.Null);
@@ -214,8 +221,11 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             TestName = "Mapper sets GPU properties - missing metrics")]
         public void MapperSetsGpuStats(GpuMode[] modes, int[] ethereumHashrates, int[] decredHashrate, int[] temperature, int[] fanSpeed, string[] statsArray)
         {
+            // arrange
+            var mapper = new MinerStatisticsMapper();
+
             // act
-            var stats = statsArray.ToMinerStatistics();
+            var stats = mapper.Map(statsArray);
 
             // assert
             Assert.That(stats.Gpus.Select(g => g.Mode).ToArray(), Is.EqualTo(modes));

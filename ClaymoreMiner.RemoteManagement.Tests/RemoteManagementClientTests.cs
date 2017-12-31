@@ -2,18 +2,15 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-
 using Moq;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 using NUnit.Framework;
 
 namespace ClaymoreMiner.RemoteManagement.Tests
 {
+    using Mapper;
     using Models;
-
     using Rpc;
 
     [TestFixture]
@@ -32,6 +29,8 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             "0;0;0;0"
         };
 
+        private RpcClientFactory _rpcClientFactory;
+        private IMapper<string[], MinerStatistics> _mapper;
         private Mock<RpcConnectionFactory> _mockRpcConnectionFactory;
         private Mock<RpcConnection> _mockRpcConnection;
         private Stream _localStream;
@@ -40,6 +39,9 @@ namespace ClaymoreMiner.RemoteManagement.Tests
         [SetUp]
         public void Setup()
         {
+            _rpcClientFactory = new RawRpcClientFactory();
+            _mapper = new MinerStatisticsMapper();
+
             _mockRpcConnectionFactory = new Mock<RpcConnectionFactory>();
             _mockRpcConnection = new Mock<RpcConnection>();
             (_localStream, _mockServerStream) = Nerdbank.FullDuplexStream.CreateStreams();
@@ -52,7 +54,7 @@ namespace ClaymoreMiner.RemoteManagement.Tests
         public async Task TestGetStatisticsAsync()
         {
             // arrange
-            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, new RawRpcClientFactory());
+            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, _rpcClientFactory, _mapper);
             
             // act
             var resultTask = client.GetStatisticsAsync();
@@ -84,7 +86,7 @@ namespace ClaymoreMiner.RemoteManagement.Tests
         public async Task TestRestartMinerAsync()
         {
             // arrange
-            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, new RawRpcClientFactory());
+            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, _rpcClientFactory, _mapper);
 
             // act
             var task = client.RestartMinerAsync();
@@ -106,7 +108,7 @@ namespace ClaymoreMiner.RemoteManagement.Tests
         public async Task RebootMinerAsync()
         {
             // arrange
-            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, new RawRpcClientFactory());
+            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, _rpcClientFactory, _mapper);
 
             // act
             var task = client.RebootMinerAsync();
@@ -130,7 +132,7 @@ namespace ClaymoreMiner.RemoteManagement.Tests
         public async Task SetGpuModeAsync(int index, GpuMode mode)
         {
             // arrange
-            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, new RawRpcClientFactory());
+            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, _rpcClientFactory, _mapper);
 
             // act
             var task = client.SetGpuModeAsync(index, mode);
@@ -154,7 +156,7 @@ namespace ClaymoreMiner.RemoteManagement.Tests
         public async Task SetGpuModeAsync(GpuMode mode)
         {
             // arrange
-            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, new RawRpcClientFactory());
+            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, _rpcClientFactory, _mapper);
 
             // act
             var task = client.SetGpuModeAsync(mode);

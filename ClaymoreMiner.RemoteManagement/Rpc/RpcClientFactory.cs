@@ -1,5 +1,4 @@
-﻿using System.IO;
-
+using System.IO;
 using StreamJsonRpc;
 
 namespace ClaymoreMiner.RemoteManagement.Rpc

@@ -6,24 +6,25 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
 {
     using Models;
 
-    internal static class MinerStatisticsMapper
+    internal class MinerStatisticsMapper : IMapper<string[], MinerStatistics>
     {
-        public static MinerStatistics ToMinerStatistics(this string[] statsArray)
+        public MinerStatistics Map(string[] source)
         {
-            var (version, _) = statsArray.TryGet(0);
-            var (uptime, _) = statsArray.TryParseTimeSpanMinutes(1);
+            var (version, _) = source.TryGet(0);
+            var (uptimeMinutes, _) = source.TryGetAndParse(1);
+            var uptime = TimeSpan.FromMinutes(uptimeMinutes);
 
-            var ethereumStats = statsArray.TryGet(2).value?.Split(';');
-            var ethereumGpuHashrates = statsArray.TryGet(3).value?.Split(';');
-            var decredStats = statsArray.TryGet(4).value?.Split(';');
-            var decredGpuHashrates = statsArray.TryGet(5).value?.Split(';');
-            var allGpuMetrics = statsArray.TryGet(6).value?.Split(';')
+            var ethereumStats = source.TryGet(2).value?.Split(';');
+            var ethereumGpuHashrates = source.TryGet(3).value?.Split(';');
+            var decredStats = source.TryGet(4).value?.Split(';');
+            var decredGpuHashrates = source.TryGet(5).value?.Split(';');
+            var allGpuMetrics = source.TryGet(6).value?.Split(';')
                 .Select((value, index) => new { value, index })
                 .GroupBy(s => s.index / 2)
                 .Select(g => g.Select(s => s.value).ToArray())
                 .ToArray();
-            var pools = statsArray.TryGet(7).value?.Split(';');
-            var additionalData = statsArray.TryGet(8).value?.Split(';')
+            var pools = source.TryGet(7).value?.Split(';');
+            var additionalData = source.TryGet(8).value?.Split(';')
                 .Select((value, index) => new { value, index })
                 .GroupBy(s => s.index / 2)
                 .Select(g => g.Select(s => s.value).ToArray())
@@ -61,12 +62,12 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
 
         private static PoolStats GetPoolStats(string pool, string[] stats, string[] additionalData)
         {
-            var (hashRate, _) = stats.TryParseInt(0);
-            var (shares, _) = stats.TryParseInt(1);
-            var (rejectedShares, _) = stats.TryParseInt(2);
+            var (hashRate, _) = stats.TryGetAndParse(0);
+            var (shares, _) = stats.TryGetAndParse(1);
+            var (rejectedShares, _) = stats.TryGetAndParse(2);
 
-            var (invalidShares, _) = additionalData.TryParseInt(0);
-            var (poolSwitches, _) = additionalData.TryParseInt(1);
+            var (invalidShares, _) = additionalData.TryGetAndParse(0);
+            var (poolSwitches, _) = additionalData.TryGetAndParse(1);
 
             var poolStats = new PoolStats(
                 pool,
@@ -85,12 +86,37 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
 
             for (var i = 0; i < gpuCount; i++)
             {
-                var (ethereumHashrate, _) = ethereumGpuHashrates.TryGet(i);
-                var (decredHashrate, _) = decredGpuHashrates.TryGet(i);
+                var parseEthereumHashrateResult = ethereumGpuHashrates.TryGetAndParse(i);
+                var parseDecredHashrateResult = decredGpuHashrates.TryGetAndParse(i);
                 var (metrics, _) = allGpuMetrics.TryGet(i);
 
-                yield return GetGpuStats(ethereumHashrate, decredHashrate, metrics);
+                yield return GetGpuStats(parseEthereumHashrateResult, parseDecredHashrateResult, metrics);
             }
+        }
+
+        private static GpuStats GetGpuStats(
+            (int value, bool success) parseEthereumHashrateResult, 
+            (int value, bool success) parseDecredHashrateResult, 
+            string[] metrics)
+        {
+            var mode = GpuMode.Disabled;
+
+            if (parseEthereumHashrateResult.success)
+                mode = GpuMode.EthereumOnly;
+            if (parseDecredHashrateResult.success)
+                mode = GpuMode.Dual;
+
+            var (temperature, _) = metrics.TryGetAndParse(0);
+            var (fanSpeed, _) = metrics.TryGetAndParse(1);
+
+            var gpuStats = new GpuStats(
+                mode,
+                parseEthereumHashrateResult.value,
+                parseDecredHashrateResult.value,
+                temperature,
+                fanSpeed);
+
+            return gpuStats;
         }
 
         private static GpuStats GetGpuStats(string ethereumHashrateString, string decredHashrateString, string[] metrics)
@@ -102,8 +128,8 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
             if (int.TryParse(decredHashrateString, out var decredHashrate))
                 mode = GpuMode.Dual;
 
-            var (temperature, _) = metrics.TryParseInt(0);
-            var (fanSpeed, _) = metrics.TryParseInt(1);
+            var (temperature, _) = metrics.TryGetAndParse(0);
+            var (fanSpeed, _) = metrics.TryGetAndParse(1);
 
             var gpuStats = new GpuStats(
                 mode,

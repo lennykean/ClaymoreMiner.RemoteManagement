@@ -1,32 +1,33 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace ClaymoreMiner.RemoteManagement
 {
     using Mapper;
-
     using Models;
-
     using Rpc;
 
     public class RemoteManagementClient
     {
         private readonly RpcConnectionFactory _rpcConnectionFactory;
         private readonly RpcClientFactory _rpcClientFactory;
+        private readonly IMapper<string[], MinerStatistics> _mapper;
 
         public RemoteManagementClient(string address, int port) :
-            this(address, port, new TcpRpcConnectionFactory(address, port), new RawRpcClientFactory()) 
-        { 
+            this(address, port, new TcpRpcConnectionFactory(address, port), new RawRpcClientFactory(), new MinerStatisticsMapper())
+        {
         }
 
         internal RemoteManagementClient(string address, int port,
             RpcConnectionFactory rpcConnectionFactory,
-            RpcClientFactory rpcClientFactory)
+            RpcClientFactory rpcClientFactory,
+            IMapper<string[], MinerStatistics> mapper)
         {
             Address = address;
             Port = port;
 
             _rpcConnectionFactory = rpcConnectionFactory;
             _rpcClientFactory = rpcClientFactory;
+            _mapper = mapper;
         }
 
         public string Address { get; }
@@ -36,7 +37,7 @@ namespace ClaymoreMiner.RemoteManagement
         {
             var stats = await InvokeAsync<string[]>("miner_getstat1");
 
-            return stats.ToMinerStatistics();
+            return _mapper.Map(stats);
         }
 
         public async Task RestartMinerAsync(string password = null)

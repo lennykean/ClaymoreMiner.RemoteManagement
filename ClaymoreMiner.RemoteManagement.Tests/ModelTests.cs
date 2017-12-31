@@ -1,7 +1,5 @@
 ﻿using ClaymoreMiner.RemoteManagement.Models;
-
 using Newtonsoft.Json;
-
 using NUnit.Framework;
 
 namespace ClaymoreMiner.RemoteManagement.Tests
@@ -27,7 +25,8 @@ namespace ClaymoreMiner.RemoteManagement.Tests
                 "eth-eu1.nanopool.org:9999",
                 "2;1;0;0"
             };
-            var stats = statsArray.ToMinerStatistics();
+            var mapper = new MinerStatisticsMapper();
+            var stats = mapper.Map(statsArray);
 
             // act
             var originalJson = JsonConvert.SerializeObject(stats);
