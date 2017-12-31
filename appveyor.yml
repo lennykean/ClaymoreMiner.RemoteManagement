@@ -1,5 +1,8 @@
-version: 1.0.{build}
 image: Visual Studio 2017
+environment:
+  major: 2
+  minor: 0
+  patch: 0
 configuration: Release
 init:
   - git config --global core.autocrlf true
