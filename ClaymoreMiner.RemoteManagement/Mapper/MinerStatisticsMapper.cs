@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace ClaymoreMiner.RemoteManagement.Mapper
@@ -11,22 +10,20 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
     {
         public static MinerStatistics ToMinerStatistics(this string[] statsArray)
         {
-            if (statsArray.Length < 9)
-                throw new ArgumentException("Unable to parse miner statistics", nameof(statsArray));
+            var (version, _) = statsArray.TryGet(0);
+            var (uptime, _) = statsArray.TryParseTimeSpanMinutes(1);
 
-            var version = statsArray[0];
-            var uptime = ParseUptime(statsArray[1]);
-            var ethereumStats = statsArray[2].Split(';');
-            var ethereumGpuHashrates = statsArray[3].Split(';');
-            var decredStats = statsArray[4].Split(';');
-            var decredGpuHashrates = statsArray[5].Split(';');
-            var allGpuMetrics = statsArray[6].Split(';')
+            var ethereumStats = statsArray.TryGet(2).value?.Split(';');
+            var ethereumGpuHashrates = statsArray.TryGet(3).value?.Split(';');
+            var decredStats = statsArray.TryGet(4).value?.Split(';');
+            var decredGpuHashrates = statsArray.TryGet(5).value?.Split(';');
+            var allGpuMetrics = statsArray.TryGet(6).value?.Split(';')
                 .Select((value, index) => new { value, index })
                 .GroupBy(s => s.index / 2)
                 .Select(g => g.Select(s => s.value).ToArray())
                 .ToArray();
-            var pools = statsArray[7].Split(';');
-            var additionalData = statsArray[8].Split(';')
+            var pools = statsArray.TryGet(7).value?.Split(';');
+            var additionalData = statsArray.TryGet(8).value?.Split(';')
                 .Select((value, index) => new { value, index })
                 .GroupBy(s => s.index / 2)
                 .Select(g => g.Select(s => s.value).ToArray())
@@ -46,37 +43,30 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
             return status;
         }
 
-        private static TimeSpan ParseUptime(string uptime)
-        {
-            if (!int.TryParse(uptime, out var uptimeMinutes))
-                return TimeSpan.Zero;
-
-            return TimeSpan.FromMinutes(uptimeMinutes);
-        }
-
         private static PoolStats GetEthereumPoolStats(string[] pools, string[] ethereumStats, string[][] additionalData)
         {
-            var ethereumPool = pools.Length > 0 ? pools[0] : null;
-            var additionalEthereumData = additionalData.Length > 1 ? additionalData[1] : Array.Empty<string>();
+            var (ethereumPool, _) = pools.TryGet(0);
+            var (additionalEthereumData, _) = additionalData.TryGet(0);
 
             return GetPoolStats(ethereumPool, ethereumStats, additionalEthereumData);
         }
 
         private static PoolStats GetDecredPoolStats(string[] pools, string[] decredStats, string[][] additionalData)
         {
-            var decredPool = pools.Length > 1 ? pools[1] : null;
-            var additionalDecredData = additionalData.Length > 1 ? additionalData[1] : Array.Empty<string>();
+            var (decredPool, _) = pools.TryGet(1);
+            var (additionalDecredData, _) = additionalData.TryGet(1);
 
             return GetPoolStats(decredPool, decredStats, additionalDecredData);
         }
 
         private static PoolStats GetPoolStats(string pool, string[] stats, string[] additionalData)
         {
-            int.TryParse(stats.Length > 0 ? stats[0] : null, out var hashRate);
-            int.TryParse(stats.Length > 1 ? stats[1] : null, out var shares);
-            int.TryParse(stats.Length > 2 ? stats[2] : null, out var rejectedShares);
-            int.TryParse(additionalData.Length > 1 ? additionalData[0] : null, out var invalidShares);
-            int.TryParse(additionalData.Length > 2 ? additionalData[1] : null, out var poolSwitches);
+            var (hashRate, _) = stats.TryParseInt(0);
+            var (shares, _) = stats.TryParseInt(1);
+            var (rejectedShares, _) = stats.TryParseInt(2);
+
+            var (invalidShares, _) = additionalData.TryParseInt(0);
+            var (poolSwitches, _) = additionalData.TryParseInt(1);
 
             var poolStats = new PoolStats(
                 pool,
@@ -95,9 +85,9 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
 
             for (var i = 0; i < gpuCount; i++)
             {
-                var ethereumHashrate = ethereumGpuHashrates.Length > i ? ethereumGpuHashrates[i] : null;
-                var decredHashrate = decredGpuHashrates.Length > i ? decredGpuHashrates[i] : null;
-                var metrics = allGpuMetrics.Length > 1 ? allGpuMetrics[i] : Array.Empty<string>();
+                var (ethereumHashrate, _) = ethereumGpuHashrates.TryGet(i);
+                var (decredHashrate, _) = decredGpuHashrates.TryGet(i);
+                var (metrics, _) = allGpuMetrics.TryGet(i);
 
                 yield return GetGpuStats(ethereumHashrate, decredHashrate, metrics);
             }
@@ -112,8 +102,8 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
             if (int.TryParse(decredHashrateString, out var decredHashrate))
                 mode = GpuMode.Dual;
 
-            int.TryParse(metrics.Length > 0 ? metrics[0] : null, out var temperature);
-            int.TryParse(metrics.Length > 1 ? metrics[1] : null, out var fanSpeed);
+            var (temperature, _) = metrics.TryParseInt(0);
+            var (fanSpeed, _) = metrics.TryParseInt(1);
 
             var gpuStats = new GpuStats(
                 mode,

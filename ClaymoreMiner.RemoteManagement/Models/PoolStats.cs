@@ -5,7 +5,7 @@ namespace ClaymoreMiner.RemoteManagement.Models
     public class PoolStats
     {
         [JsonConstructor]
-        public PoolStats(string pool, int hashRate, int shares, int invalidShares, int rejectedShares, int poolSwitches)
+        public PoolStats(string pool, int hashRate, int shares, int rejectedShares, int invalidShares, int poolSwitches)
         {
             Pool = pool;
             Hashrate = hashRate;
