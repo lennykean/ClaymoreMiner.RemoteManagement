@@ -29,7 +29,6 @@ build:
   verbosity: minimal  
 artifacts:
   - path: '**\*.nupkg'
-  - path: '**\*.symbols.nupkg'
 deploy:
 - provider: NuGet
   api_key:
