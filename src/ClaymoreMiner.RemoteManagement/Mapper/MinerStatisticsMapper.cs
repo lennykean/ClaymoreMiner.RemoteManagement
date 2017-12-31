@@ -118,27 +118,5 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
 
             return gpuStats;
         }
-
-        private static GpuStats GetGpuStats(string ethereumHashrateString, string decredHashrateString, string[] metrics)
-        {
-            var mode = GpuMode.Disabled;
-
-            if (int.TryParse(ethereumHashrateString, out var ethereumHashrate))
-                mode = GpuMode.EthereumOnly;
-            if (int.TryParse(decredHashrateString, out var decredHashrate))
-                mode = GpuMode.Dual;
-
-            var (temperature, _) = metrics.TryGetAndParse(0);
-            var (fanSpeed, _) = metrics.TryGetAndParse(1);
-
-            var gpuStats = new GpuStats(
-                mode,
-                ethereumHashrate,
-                decredHashrate,
-                temperature,
-                fanSpeed);
-
-            return gpuStats;
-        }
     }
 }

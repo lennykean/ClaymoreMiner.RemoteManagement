@@ -28,8 +28,7 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             "eth-eu1.nanopool.org:9999",
             "0;0;0;0"
         };
-
-        private RpcClientFactory _rpcClientFactory;
+        
         private IMapper<string[], MinerStatistics> _mapper;
         private Mock<RpcConnectionFactory> _mockRpcConnectionFactory;
         private Mock<RpcConnection> _mockRpcConnection;
@@ -39,7 +38,6 @@ namespace ClaymoreMiner.RemoteManagement.Tests
         [SetUp]
         public void Setup()
         {
-            _rpcClientFactory = new RawRpcClientFactory();
             _mapper = new MinerStatisticsMapper();
 
             _mockRpcConnectionFactory = new Mock<RpcConnectionFactory>();
@@ -54,22 +52,26 @@ namespace ClaymoreMiner.RemoteManagement.Tests
         public void ConstructorSetsProperties()
         {
             // arrange
-            var address = "test-miner-address";
-            var port = 3333;
+            const string address = "test-miner-address";
+            const int port = 3333;
+            const string password = "test-password";
 
             // act
-            var client = new RemoteManagementClient(address, port);
+            var client = new RemoteManagementClient(address, port, password);
 
-            //
+            // assert
             Assert.That(client, Has.Property(nameof(client.Address)).EqualTo(address));
             Assert.That(client, Has.Property(nameof(client.Port)).EqualTo(port));
+            Assert.That(client, Has.Property(nameof(client.Password)).EqualTo(password));
         }
 
-        [Test]
-        public async Task TestGetStatisticsAsync()
+        [TestCase(null, TestName = "RemoteManagementClient.GetStatisticsAsync")]
+        [TestCase("test-password", TestName = "RemoteManagementClient.GetStatisticsAsync with password")]
+        public async Task GetStatisticsAsync(string password)
         {
             // arrange
-            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, _rpcClientFactory, _mapper);
+            var rpcClientFactory = new ClaymoreApiRpcClientFactory(password);
+            var client = new RemoteManagementClient(null, 0, null, _mockRpcConnectionFactory.Object, rpcClientFactory, _mapper);
             
             // act
             var resultTask = client.GetStatisticsAsync();
@@ -95,13 +97,16 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             Assert.That(result, Is.Not.Null);
             Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("miner_getstat1"));
             Assert.That(receivedMessage["params"].ToObject<object[]>, Is.Empty);
+            Assert.That(receivedMessage["pwd"]?.ToString(), Is.EqualTo(password));
         }
-
-        [Test]
-        public async Task TestRestartMinerAsync()
+        
+        [TestCase(null, TestName = "RemoteManagementClient.RestartMinerAsync")]
+        [TestCase("test-password", TestName = "RemoteManagementClient.RestartMinerAsync with password")]
+        public async Task RestartMinerAsync(string password)
         {
             // arrange
-            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, _rpcClientFactory, _mapper);
+            var rpcClientFactory = new ClaymoreApiRpcClientFactory(password);
+            var client = new RemoteManagementClient(null, 0, null, _mockRpcConnectionFactory.Object, rpcClientFactory, _mapper);
 
             // act
             var task = client.RestartMinerAsync();
@@ -117,13 +122,16 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             // assert
             Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("miner_restart"));
             Assert.That(receivedMessage["params"].ToObject<object[]>, Is.Empty);
+            Assert.That(receivedMessage["pwd"]?.ToString(), Is.EqualTo(password));
         }
 
-        [Test]
-        public async Task RebootMinerAsync()
+        [TestCase(null, TestName = "RemoteManagementClient.RebootMinerAsync")]
+        [TestCase("test-password", TestName = "RemoteManagementClient.RebootMinerAsync with password")]
+        public async Task RebootMinerAsync(string password)
         {
             // arrange
-            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, _rpcClientFactory, _mapper);
+            var rpcClientFactory = new ClaymoreApiRpcClientFactory(password);
+            var client = new RemoteManagementClient(null, 0, null, _mockRpcConnectionFactory.Object, rpcClientFactory, _mapper);
 
             // act
             var task = client.RebootMinerAsync();
@@ -139,15 +147,20 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             // assert
             Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("miner_reboot"));
             Assert.That(receivedMessage["params"].ToObject<object[]>, Is.Empty);
+            Assert.That(receivedMessage["pwd"]?.ToString(), Is.EqualTo(password));
         }
 
-        [TestCase(1, GpuMode.Disabled)]
-        [TestCase(2, GpuMode.Dual)]
-        [TestCase(3, GpuMode.EthereumOnly)]
-        public async Task SetGpuModeAsync(int index, GpuMode mode)
+        [TestCase(null, 1, GpuMode.Disabled, TestName = "RemoteManagementClient.SetGpuModeAsync(int, Disabled)")]
+        [TestCase(null, 3, GpuMode.EthereumOnly, TestName = "RemoteManagementClient.SetGpuModeAsync(int, EthereumOnly)")]
+        [TestCase(null, 2, GpuMode.Dual, TestName = "RemoteManagementClient.SetGpuModeAsync(int, Dual)")]
+        [TestCase("test-password", 1, GpuMode.Disabled, TestName = "RemoteManagementClient.SetGpuModeAsync(int, Disabled) with password")]
+        [TestCase("test-password", 3, GpuMode.EthereumOnly, TestName = "RemoteManagementClient.SetGpuModeAsync(int, EthereumOnly) with password")]
+        [TestCase("test-password", 2, GpuMode.Dual, TestName = "RemoteManagementClient.SetGpuModeAsync(int, Dual) with password")]
+        public async Task SetGpuModeAsync(string password, int index, GpuMode mode)
         {
             // arrange
-            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, _rpcClientFactory, _mapper);
+            var rpcClientFactory = new ClaymoreApiRpcClientFactory(password);
+            var client = new RemoteManagementClient(null, 0, null, _mockRpcConnectionFactory.Object, rpcClientFactory, _mapper);
 
             // act
             var task = client.SetGpuModeAsync(index, mode);
@@ -162,16 +175,21 @@ namespace ClaymoreMiner.RemoteManagement.Tests
 
             // assert
             Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("control_gpu"));
-            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.EqualTo(new object[] {index, (int)mode}));
+            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.EqualTo(new[] {index.ToString(), ((int)mode).ToString() }));
+            Assert.That(receivedMessage["pwd"]?.ToString(), Is.EqualTo(password));
         }
-
-        [TestCase(GpuMode.Disabled)]
-        [TestCase(GpuMode.Dual)]
-        [TestCase(GpuMode.EthereumOnly)]
-        public async Task SetGpuModeAsync(GpuMode mode)
+        
+        [TestCase(null, GpuMode.Disabled, TestName = "RemoteManagementClient.SetGpuModeAsync(Disabled)")]
+        [TestCase(null, GpuMode.EthereumOnly, TestName = "RemoteManagementClient.SetGpuModeAsync(EthereumOnly)")]
+        [TestCase(null, GpuMode.Dual, TestName = "RemoteManagementClient.SetGpuModeAsync(Dual)")]
+        [TestCase("test-password", GpuMode.Disabled, TestName = "RemoteManagementClient.SetGpuModeAsync(Disabled) with password")]
+        [TestCase("test-password", GpuMode.EthereumOnly, TestName = "RemoteManagementClient.SetGpuModeAsync(EthereumOnly) with password")]
+        [TestCase("test-password", GpuMode.Dual, TestName = "RemoteManagementClient.SetGpuModeAsync(Dual) with password")]
+        public async Task SetGpuModeAsync(string password, GpuMode mode)
         {
             // arrange
-            var client = new RemoteManagementClient(null, 0, _mockRpcConnectionFactory.Object, _rpcClientFactory, _mapper);
+            var rpcClientFactory = new ClaymoreApiRpcClientFactory(password);
+            var client = new RemoteManagementClient(null, 0, null, _mockRpcConnectionFactory.Object, rpcClientFactory, _mapper);
 
             // act
             var task = client.SetGpuModeAsync(mode);
@@ -186,7 +204,8 @@ namespace ClaymoreMiner.RemoteManagement.Tests
 
             // assert
             Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("control_gpu"));
-            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.EqualTo(new object[] { -1, (int)mode }));
+            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.EqualTo(new[] { "-1", ((int)mode).ToString() }));
+            Assert.That(receivedMessage["pwd"]?.ToString(), Is.EqualTo(password));
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ClaymoreMiner.RemoteManagement.Mapper
+﻿namespace ClaymoreMiner.RemoteManagement.Mapper
 {
     internal static class ArrayExtensions
     {

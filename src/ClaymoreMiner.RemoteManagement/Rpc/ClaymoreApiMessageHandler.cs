@@ -2,14 +2,19 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StreamJsonRpc;
 
 namespace ClaymoreMiner.RemoteManagement.Rpc
 {
-    internal class RawMessageHandler : DelimitedMessageHandler
+    internal class ClaymoreApiMessageHandler : DelimitedMessageHandler
     {
-        public RawMessageHandler(Stream stream, Encoding encoding) : base(stream, stream, encoding)
+        private readonly string _password;
+
+        public ClaymoreApiMessageHandler(string password, Stream stream, Encoding encoding) : base(stream, stream, encoding)
         {
+            _password = password;
         }
 
         protected override async Task<string> ReadCoreAsync(CancellationToken cancellationToken)
@@ -30,9 +35,21 @@ namespace ClaymoreMiner.RemoteManagement.Rpc
 
         protected override async Task WriteCoreAsync(string content, Encoding contentEncoding, CancellationToken cancellationToken)
         {
-            var buffer = contentEncoding.GetBytes(content);
+            var buffer = contentEncoding.GetBytes(TransformContent(content));
 
             await SendingStream.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
+        }
+
+        private string TransformContent(string content)
+        {
+            if (_password == null)
+                return content;
+
+            var contentJson = JObject.Parse(content);
+
+            contentJson.Add("pwd", _password);
+
+            return contentJson.ToString(Formatting.None);
         }
     }
 }
