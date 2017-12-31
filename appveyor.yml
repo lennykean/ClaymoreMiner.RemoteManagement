@@ -17,7 +17,7 @@ assembly_info:
   assembly_informational_version: '{version}'
 nuget:
   project_feed: true		    
--before_build:		
+before_build:		
   - dotnet restore src
 build:  
   project: src/ClaymoreMiner.RemoteManagement.sln
