@@ -1,0 +1,32 @@
+version: 1.0.{build}
+configuration: Release
+init:
+- ps: >-
+    $isCI = $Env:APPVEYOR_REPO_TAG -eq $false
+    $isBranch = $isCI -and ($Env:APPVEYOR_REPO_BRANCH -ne 'master')
+    $branchSuffix = "$(if ($isBranch) { '-' + $Env:APPVEYOR_REPO_BRANCH } else { $null })"
+    $Env:VersionPrefix = "$($Env:major).$($Env:minor).$($Env:patch)"
+    $Env:VersionSuffix = "$(if ($isCI) { 'CI' + $Env:APPVEYOR_BUILD_NUMBER + $branchSuffix } else { $null })"
+    appveyor UpdateBuild -Version "$($Env:VersionPrefix)$(if ($isCI) { '-' } else { $null })$($Env:VersionSuffix)"
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+nuget:
+  project_feed: true
+build:
+  verbosity: normal
+artifacts:
+- path: '**\$(APPVEYOR_PROJECT_NAME).$(APPVEYOR_BUILD_VERSION).nupkg'
+- path: '**\$(APPVEYOR_PROJECT_NAME).$(APPVEYOR_BUILD_VERSION).symbols.nupkg'
+deploy:
+- provider: NuGet
+  api_key:
+    secure: Fs9ENPTv7h53rMhP9kJqdV5tueZutTV+JCr5/YUKbRml86FlKA3hj2HxEcx0q8M7HG88v+DGNSs3epMqb1cgq5IAKu5CQVPV3evGtZ2ihJs=
+  artifact: /.*\.nupkg/
+  on:
+    appveyor_repo_tag: true
