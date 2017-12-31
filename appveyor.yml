@@ -10,7 +10,7 @@ init:
     $isBranch = $isCI -and ($Env:APPVEYOR_REPO_BRANCH -ne 'master')
     $Env:VersionPrefix = "$($Env:major).$($Env:minor).$($Env:patch)"
     $Env:VersionSuffix = "$(if ($isBranch) { $Env:APPVEYOR_REPO_BRANCH + $Env:APPVEYOR_BUILD_NUMBER} else { $Env:APPVEYOR_BUILD_NUMBER })"
-    appveyor UpdateBuild -Version "$($Env:VersionPrefix)$(if ($isCI) { $Env:VersionSuffix } else { $null })"
+    appveyor UpdateBuild -Version "$($Env:VersionPrefix)$(if ($isCI) { '-' + $Env:VersionSuffix } else { $null })"
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
