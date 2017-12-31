@@ -24,7 +24,9 @@ namespace ClaymoreMiner.RemoteManagement.Rpc
                 if (buffer.Length == 0)
                     return null;
 
-                return Encoding.GetString(buffer);
+                var content = Encoding.GetString(buffer);
+
+                return content;
             }
         }
 

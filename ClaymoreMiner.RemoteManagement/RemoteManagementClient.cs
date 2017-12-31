@@ -3,7 +3,9 @@
 namespace ClaymoreMiner.RemoteManagement
 {
     using Mapper;
+
     using Models;
+
     using Rpc;
 
     public class RemoteManagementClient
@@ -12,12 +14,12 @@ namespace ClaymoreMiner.RemoteManagement
         private readonly RpcClientFactory _rpcClientFactory;
 
         public RemoteManagementClient(string address, int port) :
-            this(address, port, new TcpRpcConnectionFactory(address, port), new RawRpcClientFactory())
-        {
+            this(address, port, new TcpRpcConnectionFactory(address, port), new RawRpcClientFactory()) 
+        { 
         }
 
-        internal RemoteManagementClient(string address, int port, 
-            RpcConnectionFactory rpcConnectionFactory, 
+        internal RemoteManagementClient(string address, int port,
+            RpcConnectionFactory rpcConnectionFactory,
             RpcClientFactory rpcClientFactory)
         {
             Address = address;
