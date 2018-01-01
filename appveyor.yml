@@ -22,12 +22,12 @@ assembly_info:
 nuget:
   project_feed: true
 before_build:
-- dotnet test src/ClaymoreMiner.RemoteManagement.Tests -v n
+- dotnet restore src
 build:
   project: src/ClaymoreMiner.RemoteManagement.sln
   verbosity: minimal
 test_script:
-- dotnet test src`` -v n
+- dotnet test src/ClaymoreMiner.RemoteManagement.Tests -v n
 artifacts:
   - path: '**\*.nupkg'
 deploy:
