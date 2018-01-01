@@ -22,12 +22,12 @@ assembly_info:
 nuget:
   project_feed: true
 before_build:
-- dotnet restore src
+- dotnet test src/ClaymoreMiner.RemoteManagement.Tests -v n
 build:
   project: src/ClaymoreMiner.RemoteManagement.sln
   verbosity: minimal
 test_script:
-- nunit3-console "src\ClaymoreMiner.RemoteManagement.Tests\bin\Release\netcoreapp2.0\ClaymoreMiner.RemoteManagement.Tests.dll" --inprocess --result=myresults.xml;format=AppVeyor
+- dotnet test src`` -v n
 artifacts:
   - path: '**\*.nupkg'
 deploy:
