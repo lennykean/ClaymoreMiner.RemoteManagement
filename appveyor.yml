@@ -26,8 +26,6 @@ before_build:
 build:
   project: src/ClaymoreMiner.RemoteManagement.sln
   verbosity: minimal
-test_script:
-- nunit3-console src\ClaymoreMiner.RemoteManagement.Tests\bin\Release\netcoreapp2.0\ClaymoreMiner.RemoteManagement.Tests.dll --result=myresults.xml;format=AppVeyor
 artifacts:
   - path: '**\*.nupkg'
 deploy:
