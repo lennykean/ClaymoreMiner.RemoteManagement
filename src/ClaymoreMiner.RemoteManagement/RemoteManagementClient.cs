@@ -6,26 +6,26 @@ namespace ClaymoreMiner.RemoteManagement
     using Mapper; 
     using Models;
     using Rpc;
-
+    
     /// <summary>
     /// Remote management client for the claymore miner
     /// </summary>
-    public class RemoteManagementClient
+    public class RemoteManagementClient : IRemoteManagementClient
     {
         private readonly RpcConnectionFactory _rpcConnectionFactory;
         private readonly RpcClientFactory _rpcClientFactory;
         private readonly IMapper<string[], MinerStatistics> _mapper;
-
+        
         /// <summary>
-        /// Initializes a new <see cref="RemoteManagementClient"/> with claymores default remote management port.
+        /// Initializes a new <see cref="RemoteManagementClient" /> with claymores default remote management port.
         /// </summary>
         /// <param name="address">Miner address</param>
         public RemoteManagementClient(string address) : this(address, 3333, null)
         {
         }
-
+        
         /// <summary>
-        /// Initializes a new <see cref="RemoteManagementClient"/>.
+        /// Initializes a new <see cref="RemoteManagementClient" />.
         /// </summary>
         /// <param name="address">Miner address</param>
         /// <param name="port">Miner remote management port</param>
@@ -34,7 +34,7 @@ namespace ClaymoreMiner.RemoteManagement
         }
 
         /// <summary>
-        /// Initializes a new <see cref="RemoteManagementClient"/> with a password.
+        /// Initializes a new <see cref="RemoteManagementClient" /> with a password.
         /// </summary>
         /// <param name="address">Miner address</param>
         /// <param name="port">Miner remote management port</param>
@@ -64,7 +64,7 @@ namespace ClaymoreMiner.RemoteManagement
         /// Miner Address
         /// </summary>
         public string Address { get; }
-        
+
         /// <summary>
         /// Miner remote management port 
         /// </summary>
@@ -90,7 +90,7 @@ namespace ClaymoreMiner.RemoteManagement
         {
             await InvokeAsync("miner_restart");
         }
-
+        
         /// <summary>
         /// Reboots miner
         /// </summary>
