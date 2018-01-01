@@ -8,14 +8,15 @@ init:
 - ps: |
     $isCI = $Env:APPVEYOR_REPO_TAG -eq $false
     $isBranch = $isCI -and ($Env:APPVEYOR_REPO_BRANCH -ne 'master')
+    $branchSuffix = "$(if ($isBranch) { '-' + $Env:APPVEYOR_REPO_BRANCH } else { $null })"
     $buildPlanVersion = "$($Env:major).$($Env:minor).$($Env:patch)"
     $Env:VersionPrefix = "$(if ($isCI) { $buildPlanVersion } else { $Env:APPVEYOR_REPO_TAG_NAME })"
-    $Env:VersionSuffix = "$(if ($isBranch) { $Env:APPVEYOR_REPO_BRANCH } else { $null })$($Env:APPVEYOR_BUILD_NUMBER)"
-    appveyor UpdateBuild -Version "$($Env:VersionPrefix)$(if ($isCI) { '-' + $Env:VersionSuffix } else { $null })"
+    $Env:VersionSuffix = "$(if ($isCI) { $branchSuffix + $Env:APPVEYOR_BUILD_NUMBER } else { $null })"
+    appveyor UpdateBuild -Version "$($Env:VersionPrefix)$(if ($isCI) { '-' } else { $null })$($Env:VersionSuffix)"
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
-  assembly_version: $(VersionPrefix)
+  assembly_version: $(VersionPrefix).0
   assembly_file_version: $(VersionPrefix).$(APPVEYOR_BUILD_NUMBER)
   assembly_informational_version: $(VersionPrefix)
 nuget:
