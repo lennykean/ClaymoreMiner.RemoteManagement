@@ -7,6 +7,9 @@ namespace ClaymoreMiner.RemoteManagement.Models
     /// </summary>
     public class PoolStats
     {
+        /// <summary>
+        /// Initializes a new <see cref="PoolStats" />
+        /// </summary>
         [JsonConstructor]
         public PoolStats(string pool, int hashRate, int shares, int rejectedShares, int invalidShares, int poolSwitches)
         {

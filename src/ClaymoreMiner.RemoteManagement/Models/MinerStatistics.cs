@@ -10,6 +10,9 @@ namespace ClaymoreMiner.RemoteManagement.Models
     /// </summary>
     public class MinerStatistics
     {
+        /// <summary>
+        /// Initializes a new <see cref="MinerStatistics" />
+        /// </summary>
         [JsonConstructor]
         public MinerStatistics(string minerVersion, TimeSpan uptime, PoolStats ethereum, PoolStats decred, IEnumerable<GpuStats> gpus)
         {

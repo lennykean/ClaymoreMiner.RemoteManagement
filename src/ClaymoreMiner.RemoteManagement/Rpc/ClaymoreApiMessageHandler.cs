@@ -12,7 +12,7 @@ namespace ClaymoreMiner.RemoteManagement.Rpc
     {
         private readonly string _password;
 
-        public ClaymoreApiMessageHandler(string password, Stream stream, Encoding encoding) : base(stream, stream, encoding)
+        public ClaymoreApiMessageHandler(string password, Stream stream) : base(stream, stream, Encoding.ASCII)
         {
             _password = password;
         }

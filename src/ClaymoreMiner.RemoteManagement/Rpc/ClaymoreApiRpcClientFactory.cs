@@ -1,5 +1,4 @@
 using System.IO;
-using System.Text;
 using StreamJsonRpc;
 
 namespace ClaymoreMiner.RemoteManagement.Rpc
@@ -15,7 +14,7 @@ namespace ClaymoreMiner.RemoteManagement.Rpc
 
         public override JsonRpc Create(Stream stream)
         {
-            var rpcClient = new JsonRpc(new ClaymoreApiMessageHandler(_password, stream, Encoding.ASCII));
+            var rpcClient = new JsonRpc(new ClaymoreApiMessageHandler(_password, stream));
 
             rpcClient.StartListening();
 

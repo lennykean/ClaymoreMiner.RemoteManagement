@@ -7,6 +7,9 @@ namespace ClaymoreMiner.RemoteManagement.Models
     /// </summary>
     public class GpuStats
     {
+        /// <summary>
+        /// Initializes a new <see cref="GpuStats" />
+        /// </summary>
         [JsonConstructor]
         public GpuStats(GpuMode mode, int ethereumHashrate, int decredHashrate, int temperature, int fanSpeed)
         {

@@ -123,9 +123,9 @@ namespace ClaymoreMiner.RemoteManagement
 
         private async Task<TResult> InvokeAsync<TResult>(string method, params string[] parameters)
         {
-            using (var rpcConnection = _rpcConnectionFactory.Create())
-            using (var rpcStream = rpcConnection.GetStream())
-            using (var rpcClient = _rpcClientFactory.Create(rpcStream))
+            using (var connection = _rpcConnectionFactory.Create())
+            using (var stream = connection.GetStream())
+            using (var rpcClient = _rpcClientFactory.Create(stream))
             {
                 return await rpcClient.InvokeAsync<TResult>(method, parameters.Cast<object>().ToArray());
             }
@@ -133,9 +133,9 @@ namespace ClaymoreMiner.RemoteManagement
 
         private async Task InvokeAsync(string method, params string[] parameters)
         {
-            using (var rpcConnection = _rpcConnectionFactory.Create())
-            using (var rpcStream = rpcConnection.GetStream())
-            using (var rpcClient = _rpcClientFactory.Create(rpcStream))
+            using (var connection = _rpcConnectionFactory.Create())
+            using (var stream = connection.GetStream())
+            using (var rpcClient = _rpcClientFactory.Create(stream))
             {
                 await rpcClient.NotifyAsync(method, parameters.Cast<object>().ToArray());
             }
