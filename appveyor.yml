@@ -15,9 +15,9 @@ init:
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
-  assembly_version: $($Env:VersionPrefix)
-  assembly_file_version: $($Env:VersionPrefix).$($Env:APPVEYOR_BUILD_NUMBER)
-  assembly_informational_version: $($Env:VersionPrefix)
+  assembly_version: $(VersionPrefix)
+  assembly_file_version: $(VersionPrefix).$(APPVEYOR_BUILD_NUMBER)
+  assembly_informational_version: $(VersionPrefix)
 nuget:
   project_feed: true
 before_build:
