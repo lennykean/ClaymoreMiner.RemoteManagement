@@ -19,15 +19,15 @@ namespace ClaymoreMiner.RemoteManagement.Rpc
 
         protected override async Task<string> ReadCoreAsync(CancellationToken cancellationToken)
         {
-            using (var memoryStream = new MemoryStream())
+            using (var buffer = new MemoryStream())
             {
-                await ReceivingStream.CopyToAsync(memoryStream);
+                await ReceivingStream.CopyToAsync(buffer);
 
-                var buffer = memoryStream.ToArray();
-                if (buffer.Length == 0)
+                var contentBytes = buffer.ToArray();
+                if (contentBytes.Length == 0)
                     return null;
 
-                var content = Encoding.GetString(buffer);
+                var content = Encoding.GetString(contentBytes);
 
                 return content;
             }
@@ -35,9 +35,9 @@ namespace ClaymoreMiner.RemoteManagement.Rpc
 
         protected override async Task WriteCoreAsync(string content, Encoding contentEncoding, CancellationToken cancellationToken)
         {
-            var buffer = contentEncoding.GetBytes(TransformContent(content));
+            var contentBytes = contentEncoding.GetBytes(TransformContent(content));
 
-            await SendingStream.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
+            await SendingStream.WriteAsync(contentBytes, 0, contentBytes.Length, cancellationToken);
         }
 
         private string TransformContent(string content)

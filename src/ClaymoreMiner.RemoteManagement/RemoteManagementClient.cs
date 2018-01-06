@@ -137,7 +137,7 @@ namespace ClaymoreMiner.RemoteManagement
             using (var stream = connection.GetStream())
             using (var rpcClient = _rpcClientFactory.Create(stream))
             {
-                await rpcClient.NotifyAsync(method, parameters.Cast<object>().ToArray());
+                await rpcClient.InvokeAsync(method, parameters.Cast<object>().ToArray());
             }
         }
     }

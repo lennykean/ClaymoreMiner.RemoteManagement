@@ -84,7 +84,7 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
 
         private static IEnumerable<GpuStats> GetAllGpuStats(string[] ethereumGpuHashrates, string[] decredGpuHashrates, string[][] allGpuMetrics)
         {
-            var gpuCount = Math.Max(Math.Max(ethereumGpuHashrates.Length, decredGpuHashrates.Length), allGpuMetrics.Length);
+            var gpuCount = new [] {ethereumGpuHashrates.Length, decredGpuHashrates.Length, allGpuMetrics.Length}.Max();
 
             for (var i = 0; i < gpuCount; i++)
             {

@@ -16,7 +16,7 @@ namespace ClaymoreMiner.RemoteManagement.Tests
     [TestFixture]
     public class RemoteManagementClientTests
     {
-        private static readonly string[] ResponsePayload =
+        private static readonly string[] GetStatisticsResponsePayload =
         {
             "9.3 - ETH",
             "21",
@@ -47,7 +47,7 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             _mockRpcConnectionFactory.Setup(m => m.Create()).Returns(() => _mockRpcConnection.Object);
             _mockRpcConnection.Setup(m => m.GetStream()).Returns(() => _localStream);
         }
-
+        
         [TestCase(TestName = "RemoteManagementClient.ctor sets properties")]
         public void ConstructorSetsProperties()
         {
@@ -75,29 +75,16 @@ namespace ClaymoreMiner.RemoteManagement.Tests
             
             // act
             var resultTask = client.GetStatisticsAsync();
-            
-            // read the message sent to the server
-            var mockServerReceiveBuffer = new MemoryStream();
-            var mockServerReadTask = _mockServerStream.CopyToAsync(mockServerReceiveBuffer);
-            var receivedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerReceiveBuffer.ToArray()));
-            
-            // send the response message back to the client
-            var sendMessage = JsonConvert.SerializeObject(new {id = receivedMessage["id"], result = ResponsePayload });
-            var mockServerSendBuffer = new MemoryStream(Encoding.ASCII.GetBytes(sendMessage));
-            var mockServerWriteTask = mockServerSendBuffer.CopyToAsync(_mockServerStream);
-
-            // end the response
-            _mockServerStream.Close();
-            await Task.WhenAll(mockServerReadTask, mockServerWriteTask);
+            var requestObject = await RespondToJsonRpcRequest(_mockServerStream, GetStatisticsResponsePayload);
 
             // complete task
             var result = await resultTask;
 
             // assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("miner_getstat1"));
-            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.Empty);
-            Assert.That(receivedMessage["pwd"]?.ToString(), Is.EqualTo(password));
+            Assert.That(requestObject["method"].ToString(), Is.EqualTo("miner_getstat1"));
+            Assert.That(requestObject["params"].ToObject<object[]>, Is.Empty);
+            Assert.That(requestObject["pwd"]?.ToString(), Is.EqualTo(password));
         }
         
         [TestCase(null, TestName = "RemoteManagementClient.RestartMinerAsync")]
@@ -110,19 +97,15 @@ namespace ClaymoreMiner.RemoteManagement.Tests
 
             // act
             var task = client.RestartMinerAsync();
-
-            // read the message sent to the server
-            var mockServerReceiveBuffer = new MemoryStream();
-            await _mockServerStream.CopyToAsync(mockServerReceiveBuffer);
-            var receivedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerReceiveBuffer.ToArray()));
+            var requestObject = await RespondToJsonRpcRequest(_mockServerStream, null);
 
             // complete task
             await task;
 
             // assert
-            Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("miner_restart"));
-            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.Empty);
-            Assert.That(receivedMessage["pwd"]?.ToString(), Is.EqualTo(password));
+            Assert.That(requestObject["method"].ToString(), Is.EqualTo("miner_restart"));
+            Assert.That(requestObject["params"].ToObject<object[]>, Is.Empty);
+            Assert.That(requestObject["pwd"]?.ToString(), Is.EqualTo(password));
         }
 
         [TestCase(null, TestName = "RemoteManagementClient.RebootMinerAsync")]
@@ -135,19 +118,15 @@ namespace ClaymoreMiner.RemoteManagement.Tests
 
             // act
             var task = client.RebootMinerAsync();
-
-            // read the message sent to the server
-            var mockServerReceiveBuffer = new MemoryStream();
-            await _mockServerStream.CopyToAsync(mockServerReceiveBuffer);
-            var receivedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerReceiveBuffer.ToArray()));
+            var requestObject = await RespondToJsonRpcRequest(_mockServerStream, null);
 
             // complete task
             await task;
 
             // assert
-            Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("miner_reboot"));
-            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.Empty);
-            Assert.That(receivedMessage["pwd"]?.ToString(), Is.EqualTo(password));
+            Assert.That(requestObject["method"].ToString(), Is.EqualTo("miner_reboot"));
+            Assert.That(requestObject["params"].ToObject<object[]>, Is.Empty);
+            Assert.That(requestObject["pwd"]?.ToString(), Is.EqualTo(password));
         }
 
         [TestCase(null, 1, GpuMode.Disabled, TestName = "RemoteManagementClient.SetGpuModeAsync(int, Disabled)")]
@@ -164,19 +143,15 @@ namespace ClaymoreMiner.RemoteManagement.Tests
 
             // act
             var task = client.SetGpuModeAsync(index, mode);
-
-            // read the message sent to the server
-            var mockServerReceiveBuffer = new MemoryStream();
-            await _mockServerStream.CopyToAsync(mockServerReceiveBuffer);
-            var receivedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerReceiveBuffer.ToArray()));
+            var requestObject = await RespondToJsonRpcRequest(_mockServerStream, null);
 
             // complete task
             await task;
 
             // assert
-            Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("control_gpu"));
-            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.EqualTo(new[] {index.ToString(), ((int)mode).ToString() }));
-            Assert.That(receivedMessage["pwd"]?.ToString(), Is.EqualTo(password));
+            Assert.That(requestObject["method"].ToString(), Is.EqualTo("control_gpu"));
+            Assert.That(requestObject["params"].ToObject<object[]>, Is.EqualTo(new[] {index.ToString(), ((int)mode).ToString() }));
+            Assert.That(requestObject["pwd"]?.ToString(), Is.EqualTo(password));
         }
         
         [TestCase(null, GpuMode.Disabled, TestName = "RemoteManagementClient.SetGpuModeAsync(Disabled)")]
@@ -193,19 +168,34 @@ namespace ClaymoreMiner.RemoteManagement.Tests
 
             // act
             var task = client.SetGpuModeAsync(mode);
-
-            // read the message sent to the server
-            var mockServerReceiveBuffer = new MemoryStream();
-            await _mockServerStream.CopyToAsync(mockServerReceiveBuffer);
-            var receivedMessage = JObject.Parse(Encoding.ASCII.GetString(mockServerReceiveBuffer.ToArray()));
+            var requestObject = await RespondToJsonRpcRequest(_mockServerStream, null);
 
             // complete task
             await task;
 
             // assert
-            Assert.That(receivedMessage["method"].ToString(), Is.EqualTo("control_gpu"));
-            Assert.That(receivedMessage["params"].ToObject<object[]>, Is.EqualTo(new[] { "-1", ((int)mode).ToString() }));
-            Assert.That(receivedMessage["pwd"]?.ToString(), Is.EqualTo(password));
+            Assert.That(requestObject["method"].ToString(), Is.EqualTo("control_gpu"));
+            Assert.That(requestObject["params"].ToObject<object[]>, Is.EqualTo(new[] { "-1", ((int)mode).ToString() }));
+            Assert.That(requestObject["pwd"]?.ToString(), Is.EqualTo(password));
+        }
+
+        private static async Task<JObject> RespondToJsonRpcRequest(Stream serverStream, object response)
+        {
+            // read the message sent to the server
+            var requestBuffer = new MemoryStream();
+            var readRequestTask = serverStream.CopyToAsync(requestBuffer);
+            var requestObject = JObject.Parse(Encoding.ASCII.GetString(requestBuffer.ToArray()));
+
+            // send the response message back to the client
+            var responseObject = new { id = requestObject["id"], result = response };
+            var responseBuffer = new MemoryStream(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(responseObject)));
+            var writeResponseTask = responseBuffer.CopyToAsync(serverStream);
+
+            // end the response
+            serverStream.Close();
+            await Task.WhenAll(readRequestTask, writeResponseTask);
+
+            return requestObject;
         }
     }
 }
