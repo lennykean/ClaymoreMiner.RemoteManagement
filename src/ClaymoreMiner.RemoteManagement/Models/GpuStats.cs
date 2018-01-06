@@ -8,36 +8,24 @@ namespace ClaymoreMiner.RemoteManagement.Models
     public class GpuStats
     {
         /// <summary>
-        /// Initializes a new <see cref="GpuStats" />
-        /// </summary>
-        [JsonConstructor]
-        public GpuStats(GpuMode mode, int ethereumHashrate, int decredHashrate, int temperature, int fanSpeed)
-        {
-            Mode = mode;
-            EthereumHashrate = ethereumHashrate;
-            DecredHashrate = decredHashrate;
-            Temperature = temperature;
-            FanSpeed = fanSpeed;
-        }
-        /// <summary>
         /// GPU Mode
         /// </summary>
-        public GpuMode Mode { get; }
+        public GpuMode Mode { get; set; }
         /// <summary>
         /// Ethereum hashrate in MH/s
         /// </summary>
-        public int EthereumHashrate { get; }
+        public int EthereumHashrate { get; set; }
         /// <summary>
         /// Decred hashrate in MH/s
         /// </summary>
-        public int DecredHashrate { get; }
+        public int DecredHashrate { get; set; }
         /// <summary>
         /// GPU temperature in celsius
         /// </summary>
-        public int Temperature { get; }
+        public int Temperature { get; set; }
         /// <summary>
         /// Fanspeed %
         /// </summary>
-        public int FanSpeed { get; }
+        public int FanSpeed { get; set; }
     }
 }

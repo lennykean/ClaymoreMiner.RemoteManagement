@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace ClaymoreMiner.RemoteManagement.Models
+﻿namespace ClaymoreMiner.RemoteManagement.Models
 {
     /// <summary>
     /// Mining pool statistics
@@ -8,41 +6,28 @@ namespace ClaymoreMiner.RemoteManagement.Models
     public class PoolStats
     {
         /// <summary>
-        /// Initializes a new <see cref="PoolStats" />
-        /// </summary>
-        [JsonConstructor]
-        public PoolStats(string pool, int hashRate, int shares, int rejectedShares, int invalidShares, int poolSwitches)
-        {
-            Pool = pool;
-            Hashrate = hashRate;
-            Shares = shares;
-            RejectedShares = rejectedShares;
-            InvalidShares = invalidShares;
-            PoolSwitches = poolSwitches;
-        }
-        /// <summary>
         /// Mining pool address.
         /// </summary>
-        public string Pool { get; }
+        public string Pool { get; set; }
         /// <summary>
         /// Total hashrate.
         /// </summary>
-        public int Hashrate { get; }
+        public int Hashrate { get; set; }
         /// <summary>
         /// Total shares.
         /// </summary>
-        public int Shares { get; }
+        public int Shares { get; set; }
         /// <summary>
         /// Number of rejected shares.
         /// </summary>
-        public int RejectedShares { get; }
+        public int RejectedShares { get; set; }
         /// <summary>
         /// Number of invalid shares.
         /// </summary>
-        public int InvalidShares { get; }
+        public int InvalidShares { get; set; }
         /// <summary>
         /// Number of pool switches.
         /// </summary>
-        public int PoolSwitches { get; }
+        public int PoolSwitches { get; set; }
     }
 }

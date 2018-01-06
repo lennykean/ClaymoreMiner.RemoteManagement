@@ -34,13 +34,14 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
             var decred = GetDecredPoolStats(pools, decredStats, additionalData);
             var gpus = GetAllGpuStats(ethereumGpuHashrates, decredGpuHashrates, allGpuMetrics);
 
-            var status = new MinerStatistics(
-                version,
-                uptime,
-                ethereum,
-                decred,
-                gpus);
-
+            var status = new MinerStatistics
+            {
+                MinerVersion = version,
+                Uptime = uptime,
+                Ethereum = ethereum,
+                Decred = decred,
+                Gpus = gpus.ToList()
+            };
             return status;
         }
 
@@ -69,14 +70,15 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
             var (invalidShares, _) = additionalData.TryGetAndParse(0);
             var (poolSwitches, _) = additionalData.TryGetAndParse(1);
 
-            var poolStats = new PoolStats(
-                pool,
-                hashRate,
-                shares,
-                rejectedShares,
-                invalidShares,
-                poolSwitches);
-
+            var poolStats = new PoolStats
+            {
+                Pool = pool,
+                Hashrate = hashRate,
+                Shares = shares,
+                RejectedShares = rejectedShares,
+                InvalidShares = invalidShares,
+                PoolSwitches = poolSwitches
+            };
             return poolStats;
         }
 
@@ -109,13 +111,14 @@ namespace ClaymoreMiner.RemoteManagement.Mapper
             var (temperature, _) = metrics.TryGetAndParse(0);
             var (fanSpeed, _) = metrics.TryGetAndParse(1);
 
-            var gpuStats = new GpuStats(
-                mode,
-                parseEthereumHashrateResult.value,
-                parseDecredHashrateResult.value,
-                temperature,
-                fanSpeed);
-
+            var gpuStats = new GpuStats
+            {
+                Mode = mode,
+                EthereumHashrate = parseEthereumHashrateResult.value,
+                DecredHashrate = parseDecredHashrateResult.value,
+                Temperature = temperature,
+                FanSpeed = fanSpeed
+            };
             return gpuStats;
         }
     }
