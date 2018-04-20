@@ -2,6 +2,8 @@
 
 .NET client library for the claymore miner remote management API
 
+Also tested and works with Phoenix Miner
+
 [![Build status](https://ci.appveyor.com/api/projects/status/p8kto5lramigius7/branch/master?svg=true)](https://ci.appveyor.com/project/lennykean/claymoreminer-remotemanagement)
 [![NuGet](https://img.shields.io/nuget/v/ClaymoreMiner.RemoteManagement.svg)](https://www.nuget.org/packages/ClaymoreMiner.RemoteManagement)
 
@@ -67,7 +69,7 @@ MinerVersion|Miner version|```string```
 Uptime|Miner uptime|```TimeSpan```
 Ethereum|Ethereum statistics|```PoolStats```
 Decred|Decred statistics|```PoolStats```
-Gpus|Statistics for all GPUs|```ImmutableList<GpuStats>```
+Gpus|Statistics for all GPUs|```List<GpuStats>```
 
 #### PoolStats
 
