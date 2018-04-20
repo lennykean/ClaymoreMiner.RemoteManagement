@@ -19,17 +19,30 @@ namespace ClaymoreMiner.RemoteManagement.Rpc
 
         protected override async Task<string> ReadCoreAsync(CancellationToken cancellationToken)
         {
-            using (var buffer = new MemoryStream())
+            using (var data = new MemoryStream())
             {
-                await ReceivingStream.CopyToAsync(buffer);
+                var buffer = new byte[32768];
 
-                var contentBytes = buffer.ToArray();
-                if (contentBytes.Length == 0)
-                    return null;
+                while (true)
+                {
+                    var read = await ReceivingStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
+                    data.Write(buffer, 0, read);
 
-                var content = Encoding.GetString(contentBytes);
+                    var contentBytes = data.ToArray();
+                    if (contentBytes.Length == 0)
+                        return null;
 
-                return content;
+                    var content = Encoding.GetString(contentBytes);
+
+                    try
+                    {
+                        JObject.Parse(content);
+                        return content;
+                    }
+                    catch (JsonException)
+                    {
+                    }
+                }
             }
         }
 
@@ -42,14 +55,14 @@ namespace ClaymoreMiner.RemoteManagement.Rpc
 
         private string TransformContent(string content)
         {
-            if (_password == null)
-                return content;
-
             var contentJson = JObject.Parse(content);
 
-            contentJson.Add("pwd", _password);
+            if (_password != null)
+                contentJson.Add("pwd", _password);
 
-            return contentJson.ToString(Formatting.None);
+            var transformedContent = contentJson.ToString(Formatting.None) + '\n';
+
+            return transformedContent;
         }
     }
 }
