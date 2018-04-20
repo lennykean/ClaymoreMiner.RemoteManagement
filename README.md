@@ -43,8 +43,6 @@ var stats = await client.GetStatisticsAsync();
 
 #### Controlling the miner
 
-**Note**: The miner does not send a success/fail response back for the following operations, so there is no way to know if the operation was successful.
-
 ```csharp
 // Restart the miner
 await client.RestartMinerAsync();
